@@ -1,9 +1,9 @@
 from __future__ import annotations
-
+import os
 from openai import OpenAI
 
-
-client = OpenAI()
+# 環境変数からAPIキーを取得
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 # プレイヤーの初期ステータス
 player = {
@@ -37,10 +37,15 @@ def adventure_step(story_so_far: str, user_choice: str, hp: int, items: list[str
 
     response = client.responses.create(
         model="gpt-4.1-mini",
-        input=[{"role": "user", "content": [{"type": "text", "text": prompt}]}],
+        input=[
+            {
+                "role": "user",
+                "content": [{"type": "input_text", "text": prompt}],  # ← 修正
+            }
+        ],
         max_output_tokens=400,
     )
-    return response.output_text
+    return response.output_text  # まとめてテキスト取得OK
 
 
 def apply_event_effects(story: str) -> None:
